@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: url(../assets/images/freepatterndesign.jpg);
+    size: 5px;
+}
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+.container {
+    margin: 0 auto;
+    padding: 10px;
+    height: 950px;
+    width: 85%;
+    font-size: 20px;
+    background-color: #D86E71;
+    font-family: 'Sorts Mill Goudy', serif;
+    text-align: center;
+    float: none;
+}
+
+button{
+    size: 5px;
+    padding: 0.5;
+    color: bisque;
+    background-color: #2C325A; 
+}
