@@ -4,8 +4,6 @@ var cartoons = ["Tom and Jerry", "Space Jam", "Tweety", "Spider Man", "Pinky and
 //Create a function that creates a few default buttons from the array and displays them in HTML
 function renderButtons() {
 
-    $(".gif-buttons").empty();
-
     // Looping through the array of movies
     for (var i = 0; i < cartoons.length; i++) {
 
@@ -15,26 +13,31 @@ function renderButtons() {
         button.text(cartoons[i]);
         $(".gif-buttons").append(button);
     }
+    //The unbind method allows you to click on the GIPHYs independently of one another by removing all handelers of attached to the element
+    $(".gif-buttons").unbind("click");
+    //On CLICK event that tells the GIPHY images to start
+    $(".cartoons").on("click", function () {
+        startGif($(this).text());
+    })
 }
-renderButtons();
 
-$(".gif-button-submit").on("click", function (event) {
-    // Preventing the buttons default behavior when clicked (which is submitting a form)
-    event.preventDefault();
-    var newCartoons = $(".gif-search").val().trim();
-    // Adding the movie from the textbox to our array
-    cartoons.push(newCartoons);
+//Create a function that adds brand new buttons to the .gif-button div that has the pre-existing buttons
+function addButton(show) {
+
+    if (cartoons.indexOf(show) === -1) {
+        cartoons.push(show);
+        $(".gif-buttons").empty();
+    }
 
     renderButtons();
+}
 
-});
-
-$(".cartoons").on("click", function () {
-    var userCartoons = $(this).attr("data-name");
+//Create function that pulls GIPHY API info that will later display them on the page
+function startGif(show) {
 
     // Constructing a queryURL using the animal name
     var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
-        userCartoons + "&api_key=s6T0C4jjmcTkxvrGD6yD7HixTyV2ntAr&limit=10";
+        show + "&api_key=s6T0C4jjmcTkxvrGD6yD7HixTyV2ntAr&limit=10";
 
     // Performing an AJAX request with the queryURL
     $.ajax({
@@ -46,63 +49,60 @@ $(".cartoons").on("click", function () {
             console.log(response);
 
             var results = response.data;
-
-            //Looping through the path for each result item
-            for (var i = 0; i < results.length; i++) {
+            results.forEach(function (element) {
 
                 //Assigning the variables so that the gif can be stored and be prepended in order to show up in HTML
                 var cartoonDiv = $("<div>");
-                var p = $("<p>").text("Rating: " + results[i].rating);
-                var cartoonImage = $("<img>");
-                cartoonImage.attr("src", results[i].images.original_still.url);
-                cartoonImage.attr("data-animate", results[i].images.original.url);
+                var p = $("<p>").text("Rating: " + element.rating);
+                var cartoonImage = $("<img src = '" + element.images.fixed_height_still.url + "'>");
+
+                //Assigning attributes to the newly created image
+                cartoonImage.attr("state", "still");
+                cartoonImage.attr("data-still", element.images.fixed_height_still.url);
+                cartoonImage.attr("data-animate", element.images.fixed_height.url);
+
                 console.log(cartoonImage);
                 cartoonImage.addClass("image-div");
-                // console.log(cartoonImage);
 
+                //Appending the newly created image to the div and then prepending it to the HTML
                 cartoonDiv.append(p);
                 cartoonDiv.append(cartoonImage);
 
                 $(".gif-display").prepend(cartoonDiv);
 
-            }
-        });
+                //Conditional statement that animates the Giphy images when CLICKED
+                $(".image-div").unbind("click");
+                $(".image-div").on("click", function () {
+                    if ($(this).attr("state") === "still") {
+                        $(this).attr("state", "data-animate");
+                        $(this).attr("src", $(this).attr("data-animate"))
+                    } else {
+                        $(this).attr("state", "still");
+                        $(this).attr("src", $(this).attr("data-still"))
+                    }
+                })
 
-});
+            })
 
-$(document).on("click", ".image-div", function () {
-    var state = $(this).attr("data-state");
-
-    // console.log("it works");
-
-    // if (state === "still") {
-    //     $(this).attr("src", $(this).attr("data-animate"));
-    //     $(this).attr("data-state", "animate");
-    // } else {
-    //     $(this).attr("src", $(this).attr("data-still"));
-    //     $(this).attr("data-state", "still");
-    // }
+        })
+}
+//The function that gives generates new buttons once a name is typed into the search box
+$(document).ready(function () {
+    renderButtons();
+    $(".gif-button-submit").on("click", function () {
+        event.preventDefault();
+        addButton($(".gif-search").val().trim());
+        $(".gif-search").val("");
+    })
 })
 
 
 
 
-//PATH OF GIPHY API:
-//data[0].images.original.url
-//data[0].images.original_still.url
 
 
 
 
-//Add form to page that takes user input and appends it to the topic array in order to create brand new buttons and display on the page
 
-//Create a function with an if/else statement that tells the GIF image to animate from upon clicking it
-//Make animated image static upon another click
-
-
-
-// ALREADY DONE
-//Create an on CLICK event that displayes 10 static GIPHYs from the GIPGHY API and places on the page "gif-display" div
-//Create a function that displays rating for every GIPHY using the GIPHY API
 
 
